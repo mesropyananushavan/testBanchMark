@@ -1,0 +1,52 @@
+services:
+  app:
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    user: "www-data:www-data"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./docker/prod/php/php.ini:/usr/local/etc/php/conf.d/zz-php.ini:ro
+      - ./docker/prod/php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
+    restart: always
+
+  workspace:
+    profiles: ["tools"]
+    user: "www-data:www-data"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./docker/prod/php/php.ini:/usr/local/etc/php/conf.d/zz-php.ini:ro
+      - ./docker/prod/php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
+
+  queue:
+    user: "www-data:www-data"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./docker/prod/php/php.ini:/usr/local/etc/php/conf.d/zz-php.ini:ro
+      - ./docker/prod/php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
+    restart: always
+
+  scheduler:
+    user: "www-data:www-data"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./docker/prod/php/php.ini:/usr/local/etc/php/conf.d/zz-php.ini:ro
+      - ./docker/prod/php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
+    restart: always
+
+  nginx:
+    ports:
+      - "80:80"
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./docker/prod/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: always

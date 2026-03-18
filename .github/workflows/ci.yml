@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+
+jobs:
+  validate-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate local config
+        run: docker compose --env-file .env.local.example -f compose.yml -f compose.local.yml config > /dev/null
+
+      - name: Validate dev config
+        run: docker compose --env-file .env.dev.example -f compose.yml -f compose.dev.yml config > /dev/null
+
+      - name: Validate prod config
+        run: docker compose --env-file .env.prod.example -f compose.yml -f compose.prod.yml config > /dev/null
+
+  build-image:
+    runs-on: ubuntu-latest
+    needs: validate-compose
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build application image
+        run: docker build --file docker/base/php-fpm/Dockerfile --tag laravel-app:ci .

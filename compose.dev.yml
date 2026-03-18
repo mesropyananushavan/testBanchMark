@@ -1,0 +1,50 @@
+x-dev-php-volumes: &dev-php-volumes
+  - ./backend:/var/www/html
+  - ./docker/dev/php/php.ini:/usr/local/etc/php/conf.d/zz-php.ini:ro
+  - ./docker/dev/php/opcache.ini:/usr/local/etc/php/conf.d/zz-opcache.ini:ro
+
+services:
+  app:
+    volumes: *dev-php-volumes
+
+  workspace:
+    volumes: *dev-php-volumes
+
+  queue:
+    volumes: *dev-php-volumes
+
+  scheduler:
+    volumes: *dev-php-volumes
+
+  nginx:
+    ports:
+      - "8081:80"
+    volumes:
+      - ./backend:/var/www/html:ro
+      - ./docker/dev/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  db:
+    ports:
+      - "3308:3306"
+
+  vite:
+    image: node:22-alpine
+    working_dir: /var/www/html
+    command:
+      - sh
+      - -lc
+      - if [ ! -x node_modules/.bin/vite ]; then npm install; fi && npm run dev -- --host 0.0.0.0 --port 5173
+    volumes:
+      - ./backend:/var/www/html
+      - node_modules:/var/www/html/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  node_modules:
