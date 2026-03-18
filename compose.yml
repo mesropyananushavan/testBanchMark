@@ -28,6 +28,10 @@ x-laravel-env: &laravel-env
   CACHE_STORE: ${CACHE_STORE:-redis}
   QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
   SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+  L5_SWAGGER_GENERATE_ALWAYS: ${L5_SWAGGER_GENERATE_ALWAYS:-false}
+  L5_SWAGGER_CONST_HOST: ${L5_SWAGGER_CONST_HOST:-}
+  L5_SWAGGER_BASE_PATH: ${L5_SWAGGER_BASE_PATH:-/api}
+  L5_SWAGGER_UI_DARK_MODE: ${L5_SWAGGER_UI_DARK_MODE:-true}
 
 x-laravel-service: &laravel-service
   build: *app-build

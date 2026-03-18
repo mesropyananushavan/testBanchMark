@@ -5,15 +5,18 @@ LOCAL = $(COMPOSE_BASE) --env-file .env.local -f compose.local.yml
 DEV = $(COMPOSE_BASE) --env-file .env.dev -f compose.dev.yml
 PROD = $(COMPOSE_BASE) --env-file .env.prod -f compose.prod.yml
 
-.PHONY: help env-local env-dev env-prod validate-prod-env up-local down-local logs-local bash-local artisan-local composer-local migrate-local fresh-local test-local config-local up-dev down-dev logs-dev bash-dev deploy-dev config-dev up-prod down-prod logs-prod bash-prod deploy-prod config-prod
+.PHONY: help env-local env-dev env-prod validate-prod-env up-local down-local logs-local bash-local artisan-local composer-local migrate-local fresh-local test-local config-local swagger-local up-dev down-dev logs-dev bash-dev deploy-dev config-dev swagger-dev up-prod down-prod logs-prod bash-prod deploy-prod config-prod swagger-prod
 
 help:
 	@echo "Available targets:"
 	@echo "  env-local env-dev env-prod"
 	@echo "  validate-prod-env"
 	@echo "  up-local down-local logs-local bash-local artisan-local composer-local migrate-local fresh-local test-local config-local"
+	@echo "  swagger-local"
 	@echo "  up-dev down-dev logs-dev bash-dev deploy-dev config-dev"
+	@echo "  swagger-dev"
 	@echo "  up-prod down-prod logs-prod bash-prod deploy-prod config-prod"
+	@echo "  swagger-prod"
 
 env-local:
 	@test -f .env.local || cp .env.local.example .env.local
@@ -64,6 +67,9 @@ test-local: env-local
 config-local: env-local
 	$(LOCAL) config
 
+swagger-local: env-local
+	$(LOCAL) exec workspace php artisan l5-swagger:generate
+
 up-dev: env-dev
 	$(DEV) config > /dev/null
 	$(DEV) up -d --build --remove-orphans
@@ -87,6 +93,9 @@ deploy-dev: env-dev
 config-dev: env-dev
 	$(DEV) config
 
+swagger-dev: env-dev
+	$(DEV) exec workspace php artisan l5-swagger:generate
+
 up-prod: validate-prod-env
 	$(PROD) config > /dev/null
 	$(PROD) up -d --build --remove-orphans
@@ -109,3 +118,6 @@ deploy-prod: validate-prod-env
 
 config-prod: validate-prod-env
 	$(PROD) config
+
+swagger-prod: validate-prod-env
+	$(PROD) --profile tools run --rm workspace php artisan l5-swagger:generate

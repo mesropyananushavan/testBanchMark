@@ -7,7 +7,7 @@
 # Dependency and runtime directories
 vendor/
 node_modules/
-storage/logs/*.log
+backend/storage/logs/*.log
 
 # IDE files
 .idea/
